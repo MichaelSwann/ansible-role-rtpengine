@@ -1,0 +1,53 @@
+[Unit]
+Description=rtpengine
+After=syslog.target network.target local-fs.target
+
+[Service]
+; service
+Type=forking
+{% if 'aws' == cloud_provider %}
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`'
+ExecStartPre=/bin/sh -c 'systemctl set-environment PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`'
+ExecStart=/usr/local/bin/rtpengine --interface ${LOCAL_IP}!${PUBLIC_IP} \
+{% elif 'gcp' == cloud_provider %}
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip`'
+ExecStartPre=/bin/sh -c 'systemctl set-environment PUBLIC_IP=`curl -s -H "Metadata-Flavor: Google" http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip`'
+ExecStart=/usr/local/bin/rtpengine --interface ${LOCAL_IP}!${PUBLIC_IP} \
+{% elif 'azure' == cloud_provider %}
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=`curl -s -H "Metadata:true" http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text`'
+ExecStartPre=/bin/sh -c 'systemctl set-environment PUBLIC_IP=`curl -s -H "Metadata:true" http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2017-08-01&format=text`'
+ExecStart=/usr/local/bin/rtpengine --interface ${LOCAL_IP}!${PUBLIC_IP} \
+{% else %}
+ExecStart=/usr/local/bin/rtpengine --interface {{ ansible_default_ipv4.address }}!{{ inventory_hostname }} \
+{% endif %}
+--listen-ng={{ rtp_engine_NG_port }} \
+--listen-udp={{ rtp_engine_udp_port }} \
+--listen-cli={{ rtp_engine_cli_port }} \
+--pidfile /var/run/rtpengine.pid \
+--port-min {{ rtp_engine_min_port }} \
+--port-max {{ rtp_engine_max_port }} \
+--recording-dir {{ rtp_engine_recording_dir }} \
+--recording-method {{ rtp_engine_recording_method }} \
+--recording-format {{ rtp_engine_recording_format }} \
+--log-level {{ rtp_engine_log_level }} \
+--delete-delay 1
+PIDFile=/var/run/rtpengine.pid
+TimeoutSec=15s
+Restart=always
+; exec
+User=root
+Group=daemon
+LimitCORE=infinity
+LimitNOFILE=100000
+LimitNPROC=60000
+;LimitSTACK=240
+LimitRTPRIO=infinity
+LimitRTTIME=7000000
+IOSchedulingClass=realtime
+IOSchedulingPriority=2
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority=89
+UMask=0007
+
+[Install]
+WantedBy=multi-user.target

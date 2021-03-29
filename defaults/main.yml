@@ -1,2 +1,40 @@
 ---
 # defaults file for rtpengine
+rtp_engine_version: mr9.3.1.2
+rtp_engine_recording_dir: /tmp
+rtp_engine_recording_method: pcap
+rtp_engine_recording_format: eth
+rtp_engine_udp_port: 12222
+rtp_engine_NG_port: 22222
+rtp_engine_cli_port: 127.0.0.1:9900
+rtp_engine_log_level: 6
+rtp_engine_min_port: 40000
+rtp_engine_max_port: 60000
+homer_protocol: udp
+cloud_provider: none
+remove_source: false
+
+debian_packages:
+  - gcc
+  - g++
+  - make
+  - cmake
+  - build-essential
+  - git
+  - default-libmysqlclient-dev
+  - libnftables-dev
+  - libavfilter-dev
+  - libavcodec-dev
+  - libswresample-dev
+  - libevent-dev
+  - libiptc-dev
+  - libwebsockets-dev
+  - libpcap-dev
+  - libxmlrpc-core-c3-dev
+  - markdown
+  - libjson-glib-dev
+  - libhiredis-dev
+  - libssl-dev
+  - libcurl4-openssl-dev
+  - gperf
+  - libspandsp-dev

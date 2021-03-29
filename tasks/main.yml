@@ -1,2 +1,63 @@
 ---
-# tasks file for rtpengine
+- name: Update apt-cache
+  apt:
+    update_cache: true
+    cache_valid_time: 7200
+
+- name: Install rtpengine dependencies.
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ debian_packages }}"
+
+- name: Ensure rtpengine is set to start on boot.
+  service:
+    name: rtpengine
+    state: stopped
+
+- name: Make source directory writeable.
+  file:
+    path: /usr/local/src
+    state: directory
+    mode: 0777
+
+- name: Check out rtpengine.
+  git:
+    repo: https://github.com/sipwise/rtpengine.git
+    dest: /usr/local/src/rtpengine
+    version: "{{rtp_engine_version}}"
+    depth: 50
+    accept_hostkey: yes
+    force: yes
+  become: no
+
+- name: Build rtpengine.
+  shell:
+    cmd: make with_transcoding=yes
+    chdir: /usr/local/src/rtpengine/daemon
+
+- name: Install rtpengine.
+  shell: cp /usr/local/src/rtpengine/daemon/rtpengine /usr/local/bin
+
+- name: Create systemd unit file.
+  template:
+    src: rtpengine.service.j2
+    dest: /etc/systemd/system/rtpengine.service
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Systemctl daemon-reload.
+  shell: systemctl daemon-reload
+
+- name: Ensure rtpengine is set to start on boot.
+  service:
+    name: rtpengine
+    enabled: yes
+    state: restarted
+
+- name: remove source code
+  file:
+    path: /usr/local/src/rtpengine
+    state: absent
+  when: remove_source|bool
