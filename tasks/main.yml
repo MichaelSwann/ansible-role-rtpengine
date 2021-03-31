@@ -10,11 +10,6 @@
     state: present
   with_items: "{{ debian_packages }}"
 
-- name: Ensure rtpengine is set to start on boot.
-  service:
-    name: rtpengine
-    state: stopped
-
 - name: Make source directory writeable.
   file:
     path: /usr/local/src
@@ -25,19 +20,29 @@
   git:
     repo: https://github.com/sipwise/rtpengine.git
     dest: /usr/local/src/rtpengine
-    version: "{{rtp_engine_version}}"
+    version: "mr{{ rtp_engine_version }}"
     depth: 50
     accept_hostkey: yes
     force: yes
   become: no
 
 - name: Build rtpengine.
-  shell:
-    cmd: make with_transcoding=yes
-    chdir: /usr/local/src/rtpengine/daemon
+  command:
+    chdir: /usr/local/src/rtpengine
+    argv: dpkg-buildpackage
+  environment:
+    DEB_BUILD_PROFILES: "pkg.ngcp-rtpengine.nobcg729"
 
-- name: Install rtpengine.
-  shell: cp /usr/local/src/rtpengine/daemon/rtpengine /usr/local/bin
+- name: Install rtpengine debian packages.
+  apt:
+    deb: "/usr/local/src/{{ item }}"
+  with_items: "{{ rtp_engine_debian_build_packages }}"
+
+- name: Clean up rtpengine debian packages.
+  ansible.builtin.file:
+    path: "/usr/local/src/{{ item }}"
+    state: absent
+  with_items: "{{ rtp_engine_debian_build_packages }}"
 
 - name: Create systemd unit file.
   template:

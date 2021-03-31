@@ -1,18 +1,30 @@
 ---
 # defaults file for rtpengine
-rtp_engine_version: mr9.3.1.2
+rtp_engine_version: 9.3.1.2
 rtp_engine_recording_dir: /tmp
 rtp_engine_recording_method: pcap
 rtp_engine_recording_format: eth
 rtp_engine_udp_port: 12222
-rtp_engine_NG_port: 22222
+rtp_engine_tcp_port: 25060
+rtp_engine_ng_port: 22222
 rtp_engine_cli_port: 127.0.0.1:9900
 rtp_engine_log_level: 6
 rtp_engine_min_port: 40000
-rtp_engine_max_port: 60000
-homer_protocol: udp
+rtp_engine_max_port: 65000
+rtp_engine_table: 0
+rtp_engine_timeout: 60
+rtp_engine_threads: 8
+rtp_engine_silent_timeout: 1800
+rtp_engine_tos: 184
+rtp_engine_log_facility: local3
+rtp_engine_log_facility_rtcp: local1
+rtp_engine_log_facility_cdr: local2
 cloud_provider: none
 remove_source: false
+homer_host: 127.0.0.1
+homer_port: 9060
+homer_protocol: udp
+homer_id: 199
 
 debian_packages:
   - gcc
@@ -38,3 +50,24 @@ debian_packages:
   - libcurl4-openssl-dev
   - gperf
   - libspandsp-dev
+  - debhelper-compat
+  - libbencode-perl
+  - libcrypt-openssl-rsa-perl
+  - libcrypt-rijndael-perl
+  - libdigest-crc-perl
+  - libdigest-hmac-perl
+  - libio-multiplex-perl
+  - libio-socket-inet6-perl
+  - libnet-interface-perl
+  - libsocket6-perl
+  - libsystemd-dev
+  - libxtables-dev
+
+rtp_engine_debian_build_packages:
+    - "ngcp-rtpengine-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-iptables_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-kernel-dkms_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
+    - "ngcp-rtpengine-kernel-source_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
+    - "ngcp-rtpengine-recording-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-utils_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
+    - "ngcp-rtpengine_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"

@@ -18,19 +18,32 @@ ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=`curl -s -H "Metadat
 ExecStartPre=/bin/sh -c 'systemctl set-environment PUBLIC_IP=`curl -s -H "Metadata:true" http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2017-08-01&format=text`'
 ExecStart=/usr/local/bin/rtpengine --interface ${LOCAL_IP}!${PUBLIC_IP} \
 {% else %}
-ExecStart=/usr/local/bin/rtpengine --interface {{ ansible_default_ipv4.address }}!{{ inventory_hostname }} \
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP={{ rtp_engine_interface_ipaddress | default(ansible_host) }}'
+ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP} \
 {% endif %}
---listen-ng={{ rtp_engine_NG_port }} \
---listen-udp={{ rtp_engine_udp_port }} \
+--listen-ng=${LOCAL_IP}:{{ rtp_engine_ng_port }} \
+--listen-tcp=${LOCAL_IP}:{{ rtp_engine_tcp_port }} \
+--listen-udp=${LOCAL_IP}:{{ rtp_engine_udp_port }} \
 --listen-cli={{ rtp_engine_cli_port }} \
 --pidfile /var/run/rtpengine.pid \
 --port-min {{ rtp_engine_min_port }} \
 --port-max {{ rtp_engine_max_port }} \
+--table {{ rtp_engine_table }} \
+--silent-timeout {{ rtp_engine_silent_timeout | default(3600) }} \
+--timeout {{ rtp_engine_timeout | default(60) }} \
+--tos {{ rtp_engine_tos | default(184) }} \
+--num-threads {{ rpt_engine_threads | default(4) }} \
+--log-facility {{ rtp_engine_log_facility }} \
+--log-facility-rtcp {{ rtp_engine_log_facility_rtcp }} \
+--log-facility-cdr {{ rtp_engine_log_facility_cdr }} \
 --recording-dir {{ rtp_engine_recording_dir }} \
 --recording-method {{ rtp_engine_recording_method }} \
 --recording-format {{ rtp_engine_recording_format }} \
 --log-level {{ rtp_engine_log_level }} \
---delete-delay 1
+--delete-delay 1 \
+--homer {{ homer_host }}:{{ homer_port }} \
+--homer-protocol {{ homer_protocol }} \
+--homer-id {{ homer_id }}
 PIDFile=/var/run/rtpengine.pid
 TimeoutSec=15s
 Restart=always
