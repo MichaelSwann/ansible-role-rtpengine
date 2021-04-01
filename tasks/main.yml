@@ -1,4 +1,25 @@
 ---
+- name: Check if rtpengine is installed.
+  stat:
+    path: /usr/sbin/rtpengine
+  register: rtpengine_binary
+
+- name: Log
+  debug:
+    msg: "rtpengine binary exists"
+  when: rtpengine_binary.stat.exists
+
+- name: Get the current rtpengine version.
+  shell:
+    cmd: "rtpengine --version 2>&1 | cut -c 10- | sed -e 's/\\+.*$//'"
+  register: rtpengine_binary_version
+  when: rtpengine_binary.stat.exists
+
+- name: Log
+  debug:
+    msg: "Current version of rtpengine is {{ rtpengine_binary_version.stdout }}"
+  when: rtpengine_binary.stat.exists
+
 - name: Update apt-cache
   apt:
     update_cache: true
@@ -9,40 +30,39 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ debian_packages }}"
+  when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Make source directory writeable.
   file:
-    path: /usr/local/src
+    path: /usr/local/src/rtpengine_build
     state: directory
     mode: 0777
+  when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Check out rtpengine.
   git:
     repo: https://github.com/sipwise/rtpengine.git
-    dest: /usr/local/src/rtpengine
+    dest: /usr/local/src/rtpengine_build/rtpengine
     version: "mr{{ rtp_engine_version }}"
     depth: 50
     accept_hostkey: yes
     force: yes
   become: no
+  when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Build rtpengine.
   command:
-    chdir: /usr/local/src/rtpengine
+    chdir: /usr/local/src/rtpengine_build/rtpengine
     argv: dpkg-buildpackage
   environment:
     DEB_BUILD_PROFILES: "pkg.ngcp-rtpengine.nobcg729"
+  when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Install rtpengine debian packages.
   apt:
-    deb: "/usr/local/src/{{ item }}"
+    deb: "/usr/local/src/rtpengine_build/{{ item }}"
   with_items: "{{ rtp_engine_debian_build_packages }}"
-
-- name: Clean up rtpengine debian packages.
-  ansible.builtin.file:
-    path: "/usr/local/src/{{ item }}"
-    state: absent
-  with_items: "{{ rtp_engine_debian_build_packages }}"
+  when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Create systemd unit file.
   template:
@@ -52,17 +72,14 @@
     owner: root
     group: root
 
-- name: Systemctl daemon-reload.
-  shell: systemctl daemon-reload
-
 - name: Ensure rtpengine is set to start on boot.
-  service:
+  systemd:
     name: rtpengine
     enabled: yes
     state: restarted
 
 - name: remove source code
   file:
-    path: /usr/local/src/rtpengine
+    path: /usr/local/src/rtpengine_build
     state: absent
   when: remove_source|bool

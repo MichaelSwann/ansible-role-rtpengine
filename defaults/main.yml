@@ -19,12 +19,13 @@ rtp_engine_tos: 184
 rtp_engine_log_facility: local3
 rtp_engine_log_facility_rtcp: local1
 rtp_engine_log_facility_cdr: local2
-cloud_provider: none
-remove_source: false
 homer_host: 127.0.0.1
 homer_port: 9060
 homer_protocol: udp
 homer_id: 199
+
+cloud_provider: none
+remove_source: false
 
 debian_packages:
   - gcc
