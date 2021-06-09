@@ -25,7 +25,7 @@ ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP} \
 --listen-tcp=${LOCAL_IP}:{{ rtp_engine_tcp_port }} \
 --listen-udp=${LOCAL_IP}:{{ rtp_engine_udp_port }} \
 --listen-cli={{ rtp_engine_cli_port }} \
---pidfile /var/run/rtpengine.pid \
+--pidfile /run/rtpengine.pid \
 --port-min {{ rtp_engine_min_port }} \
 --port-max {{ rtp_engine_max_port }} \
 --table {{ rtp_engine_table }} \
@@ -44,7 +44,7 @@ ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP} \
 --homer {{ homer_host }}:{{ homer_port }} \
 --homer-protocol {{ homer_protocol }} \
 --homer-id {{ homer_id }}
-PIDFile=/var/run/rtpengine.pid
+PIDFile=/run/rtpengine.pid
 TimeoutSec=15s
 Restart=always
 ; exec
