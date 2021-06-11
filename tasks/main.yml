@@ -9,6 +9,14 @@
     msg: "rtpengine binary exists"
   when: rtpengine_binary.stat.exists
 
+- name: Ensure /var/log/rtpengine directory exists.
+  file:
+    path: /var/log/rtpengine
+    state: directory
+    owner: syslog
+    group: adm
+    mode: 0755
+
 - name: Get the current rtpengine version.
   shell:
     cmd: "rtpengine --version 2>&1 | cut -c 10- | sed -e 's/\\+.*$//'"

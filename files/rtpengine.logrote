@@ -1,0 +1,10 @@
+/var/log/rtpengine/rtpengine-cdrs.log
+/var/log/rtpengine/rtpengine-rtcp.log
+/var/log/rtpengine/rtpengine.log {
+    daily
+    rotate 7
+    compress
+    dateext
+    missingok
+    copytruncate
+}

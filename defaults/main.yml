@@ -1,6 +1,6 @@
 ---
 # defaults file for rtpengine
-rtp_engine_version: 9.3.1.2
+rtp_engine_version: 9.4.1.2
 rtp_engine_recording_dir: /tmp
 rtp_engine_recording_method: pcap
 rtp_engine_recording_format: eth
