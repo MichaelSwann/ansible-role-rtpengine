@@ -4,7 +4,7 @@
     path: /usr/sbin/rtpengine
   register: rtpengine_binary
 
-- name: Log
+- name: LOG
   debug:
     msg: "rtpengine binary exists"
   when: rtpengine_binary.stat.exists
@@ -23,7 +23,7 @@
   register: rtpengine_binary_version
   when: rtpengine_binary.stat.exists
 
-- name: Log
+- name: LOG
   debug:
     msg: "Current version of rtpengine is {{ rtpengine_binary_version.stdout }}"
   when: rtpengine_binary.stat.exists

@@ -1,6 +1,6 @@
 ---
 # defaults file for rtpengine
-rtp_engine_version: 9.4.1.2
+rtp_engine_version: 9.4.1.5
 rtp_engine_recording_dir: /tmp
 rtp_engine_recording_method: pcap
 rtp_engine_recording_format: eth
@@ -65,10 +65,10 @@ debian_packages:
   - libxtables-dev
 
 rtp_engine_debian_build_packages:
-    - "ngcp-rtpengine-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-utils_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine-iptables_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
     - "ngcp-rtpengine-kernel-dkms_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine-kernel-source_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine-recording-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
-    - "ngcp-rtpengine-utils_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
