@@ -71,4 +71,8 @@ rtp_engine_debian_build_packages:
     - "ngcp-rtpengine-kernel-dkms_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine-kernel-source_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
     - "ngcp-rtpengine-recording-daemon_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.deb"
+    - "ngcp-rtpengine-recording-daemon-dbgsym_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.ddeb"
+    - "ngcp-rtpengine-daemon-dbgsym_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.ddeb"
+    - "ngcp-rtpengine-iptables-dbgsym_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_amd64.ddeb"
     - "ngcp-rtpengine_{{ rtp_engine_version }}+0~mr{{ rtp_engine_version }}_all.deb"
+
