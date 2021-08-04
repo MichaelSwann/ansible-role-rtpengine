@@ -36,18 +36,24 @@ ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP} \
 --log-facility {{ rtp_engine_log_facility }} \
 --log-facility-rtcp {{ rtp_engine_log_facility_rtcp }} \
 --log-facility-cdr {{ rtp_engine_log_facility_cdr }} \
+{% if rtp_engine_recording_enabled %}
 --recording-dir {{ rtp_engine_recording_dir }} \
 --recording-method {{ rtp_engine_recording_method }} \
 --recording-format {{ rtp_engine_recording_format }} \
---log-level {{ rtp_engine_log_level }} \
---delete-delay 1 \
+{% endif %}
+{% if homer_enabled %}
 --homer {{ homer_host }}:{{ homer_port }} \
 --homer-protocol {{ homer_protocol }} \
 --homer-id {{ homer_id }}
+{% endif %}
+--log-level {{ rtp_engine_log_level }} \
+--delete-delay 1 \
+--no-fallback
 PIDFile=/run/rtpengine.pid
 TimeoutSec=15s
 Restart=always
 ; exec
+{% if rtp_engine_environment != 'test' %}
 User=root
 Group=daemon
 LimitCORE=infinity
@@ -61,6 +67,7 @@ IOSchedulingPriority=2
 CPUSchedulingPolicy=rr
 CPUSchedulingPriority=89
 UMask=0007
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

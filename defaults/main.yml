@@ -1,6 +1,8 @@
 ---
 # defaults file for rtpengine
+rtp_engine_environment: production
 rtp_engine_version: 9.0.1.10
+rtp_engine_recording_enabled: false
 rtp_engine_recording_dir: /tmp
 rtp_engine_recording_method: pcap
 rtp_engine_recording_format: eth
@@ -19,6 +21,7 @@ rtp_engine_tos: 184
 rtp_engine_log_facility: local0
 rtp_engine_log_facility_rtcp: local1
 rtp_engine_log_facility_cdr: local2
+homer_enabled: false
 homer_host: 127.0.0.1
 homer_port: 9060
 homer_protocol: udp

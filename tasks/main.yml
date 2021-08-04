@@ -1,16 +1,16 @@
 ---
 - name: Check if rtpengine is installed.
-  stat:
+  ansible.builtin.stat:
     path: /usr/sbin/rtpengine
   register: rtpengine_binary
 
 - name: LOG
-  debug:
+  ansible.builtin.debug:
     msg: "rtpengine binary exists"
   when: rtpengine_binary.stat.exists
 
 - name: Ensure /var/log/rtpengine directory exists.
-  file:
+  ansible.builtin.file:
     path: /var/log/rtpengine
     state: directory
     owner: syslog
@@ -18,37 +18,37 @@
     mode: 0755
 
 - name: Get the current rtpengine version.
-  shell:
+  ansible.builtin.shell:
     cmd: "rtpengine --version 2>&1 | cut -c 10- | sed -e 's/\\+.*$//'"
   register: rtpengine_binary_version
   when: rtpengine_binary.stat.exists
 
 - name: LOG
-  debug:
+  ansible.builtin.debug:
     msg: "Current version of rtpengine is {{ rtpengine_binary_version.stdout }}"
   when: rtpengine_binary.stat.exists
 
 - name: Update apt-cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 7200
 
 - name: Install rtpengine dependencies.
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items: "{{ debian_packages }}"
   when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Make source directory writeable.
-  file:
+  ansible.builtin.file:
     path: /usr/local/src/rtpengine_build
     state: directory
     mode: 0777
   when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Check out rtpengine.
-  git:
+  ansible.builtin.git:
     repo: https://github.com/sipwise/rtpengine.git
     dest: /usr/local/src/rtpengine_build/rtpengine
     version: "mr{{ rtp_engine_version }}"
@@ -59,7 +59,7 @@
   when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Build rtpengine.
-  command:
+  ansible.builtin.command:
     chdir: /usr/local/src/rtpengine_build/rtpengine
     argv: dpkg-buildpackage
   environment:
@@ -67,13 +67,29 @@
   when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
 - name: Install rtpengine debian packages.
-  apt:
+  ansible.builtin.apt:
     deb: "/usr/local/src/rtpengine_build/{{ item }}"
   with_items: "{{ rtp_engine_debian_build_packages }}"
   when: not rtpengine_binary.stat.exists or rtp_engine_version != rtpengine_binary_version.stdout
 
+- name: Setup the logrotate strategy.
+  ansible.builtin.copy:
+    src: rtpengine.logrotate
+    dest: /etc/logrotate.d/rtpengine
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Setup the rsyslog for rtpengine.
+  ansible.builtin.copy:
+    src: 30-rtpengine.conf
+    dest: /etc/rsyslog.d/30-rtpengine.conf
+    mode: 0644
+    owner: root
+    group: root
+
 - name: Create systemd unit file.
-  template:
+  ansible.builtin.template:
     src: rtpengine.service.j2
     dest: /etc/systemd/system/rtpengine.service
     mode: 0644
@@ -81,13 +97,13 @@
     group: root
 
 - name: Ensure rtpengine is set to start on boot.
-  systemd:
+  ansible.builtin.systemd:
     name: rtpengine
     enabled: yes
     state: restarted
 
 - name: remove source code
-  file:
+  ansible.builtin.file:
     path: /usr/local/src/rtpengine_build
     state: absent
   when: remove_source|bool

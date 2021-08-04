@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    rtp_engine_environment: test
+
+  tasks:
+
+    - name: Update apt cache (on Ubuntu)
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Include rtpengine role
+      include_role:
+        name: rtpengine
