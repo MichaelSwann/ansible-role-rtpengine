@@ -1,0 +1,14 @@
+[Unit]
+Description=Prepare rtpengine
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/sbin/modprobe xt_RTPENGINE
+ExecStart=/usr/sbin/iptables -I rtpengine -p udp -j RTPENGINE --id 0
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+RequiredBy=rtpengine.service
+WantedBy=basic.target
