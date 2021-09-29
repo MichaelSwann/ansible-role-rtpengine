@@ -21,6 +21,7 @@ rtp_engine_tos: 184
 rtp_engine_log_facility: local0
 rtp_engine_log_facility_rtcp: local1
 rtp_engine_log_facility_cdr: local2
+rtp_engine_http: false
 homer_enabled: false
 homer_host: 127.0.0.1
 homer_port: 9060

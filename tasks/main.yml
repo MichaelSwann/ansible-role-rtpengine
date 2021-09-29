@@ -88,6 +88,14 @@
     owner: root
     group: root
 
+- name: Create the prepare-rtpengine systemd file.
+  ansible.builtin.copy:
+    src: prepare-rtpengine.service
+    dest: /etc/systemd/system/prepare-rtpengine.service
+    mode: 0600
+    owner: root
+    group: root
+
 - name: Create systemd unit file.
   ansible.builtin.template:
     src: rtpengine.service.j2

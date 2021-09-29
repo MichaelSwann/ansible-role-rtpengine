@@ -22,7 +22,9 @@ ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP}!${PUBLIC_IP} \
 ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP={{ rtp_engine_interface_ipaddress | default(ansible_host) }}'
 ExecStart=/usr/sbin/rtpengine --interface ${LOCAL_IP} \
 {% endif %}
+{% if rtp_engine_http %}
 --listen-http=${LOCAL_IP}:9091 \
+{% endif %}
 --listen-ng=${LOCAL_IP}:{{ rtp_engine_ng_port }} \
 --listen-tcp=${LOCAL_IP}:{{ rtp_engine_tcp_port }} \
 --listen-udp=${LOCAL_IP}:{{ rtp_engine_udp_port }} \
